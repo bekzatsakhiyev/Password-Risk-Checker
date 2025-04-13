@@ -1,0 +1,29 @@
+import tensorflow as tf
+import numpy as np
+
+# 1. Генерация синтетических данных
+data = np.random.normal(size=(1000, 10))  # 1000 примеров, 10 признаков
+labels = np.random.randint(0, 2, size=(1000,))  # Бинарные метки (0 или 1)
+
+# 2. Создание модели
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(32, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(16, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+# 3. Компиляция и обучение
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(data, labels, epochs=10, batch_size=32)
+
+# 4. Конвертация в TensorFlow Lite
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+# 5. Сохранение модели
+with open('anomaly_detector.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+# 6. Скачивание файла .tflite
+from google.colab import files
+files.download('anomaly_detector.tflite')
